@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
 
 type StatusApp struct {
@@ -71,6 +72,7 @@ func CreateStatusApp(config string, JMODPort string, JMODKey string, JablkoCoreP
 	app.router = mux.NewRouter()
 	app.router.HandleFunc("/webComponent", app.HandleWebComponent)
 	app.router.HandleFunc("/instanceData", app.HandleInstanceData)
+	app.router.HandleFunc("/jmod/clientWebsocket", app.HandleClientWebsocket)
 
 	return app
 }
@@ -90,7 +92,29 @@ func (app *StatusApp) HandleWebComponent(w http.ResponseWriter, r *http.Request)
 }
 
 func (app *StatusApp) HandleInstanceData(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, `{"fart": "Hello"}`)
+	fmt.Fprintf(w, `{}`)
+}
+
+var upgrader = websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return true }}
+
+func (app *StatusApp) HandleClientWebsocket(w http.ResponseWriter, r *http.Request) {
+	log.Println("Client connecting to live view...")
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	conn.WriteMessage(1, []byte("Hello"))
+
+	for {
+		messageType, message, err := conn.ReadMessage()
+		log.Println(messageType, message)
+		if err != nil {
+			log.Println("Error reading client")
+			return
+		}
+	}
 }
 
 // Sometimes it's just too easy
