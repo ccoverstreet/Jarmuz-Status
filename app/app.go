@@ -92,7 +92,7 @@ func (app *StatusApp) HandleWebComponent(w http.ResponseWriter, r *http.Request)
 }
 
 func (app *StatusApp) HandleInstanceData(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, `{}`)
+	fmt.Fprintf(w, `[{}, {}]`)
 }
 
 var upgrader = websocket.Upgrader{CheckOrigin: func(*http.Request) bool { return true }}
