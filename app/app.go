@@ -110,11 +110,11 @@ func (app *StatusApp) Poll() {
 		wg.Add(len(app.Devices))
 
 		for i, device := range app.Devices {
-			go func(id int, wg *sync.WaitGroup) {
+			go func(id int, device string, wg *sync.WaitGroup) {
 				defer wg.Done()
 				outputData[id] = statusInfo{device, Ping(device)}
 				log.Println(device, id)
-			}(i, &wg)
+			}(i, device, &wg)
 		}
 
 		wg.Wait()
