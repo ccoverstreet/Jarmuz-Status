@@ -42,6 +42,7 @@ svg > * {
 				<th>Status</th>
 			</tr>
 		</table>
+		<div id="status-output"></div>
 	</div>
 </div>
 		`
@@ -55,8 +56,12 @@ svg > * {
 		}
 	}
 
-	websocketHandler(event) {
+	async websocketHandler(event) {
 		let message = event.data;
 		console.log(message);
+		let parsed = await JSON.parse(message);
+		console.log(parsed);
+		let outputElem = this.shadowRoot.getElementById("status-output");
+		outputElem.innerHTML = message
 	}
 }
