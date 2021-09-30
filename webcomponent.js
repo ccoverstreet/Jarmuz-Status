@@ -89,13 +89,26 @@ svg > * {
 		let table = this.shadowRoot.getElementById("status-table").querySelector("tbody");
 		table.innerHTML = "";
 
+		parsed.sort((a, b) => {
+			if (a.IP < b.IP) {
+				return -1;
+			} 
+			if (a.IP > b.IP) {
+				return 1;
+			}
+			return 0;
+		});
 
 		for (const n in parsed) {
 			let device = parsed[n];
 			let row = table.insertRow();
 			row.insertCell(0).innerHTML = device.IP;
 			row.insertCell(1).innerHTML = device.Name;
-			row.insertCell(2).innerHTML = device.IsOnline;
+			if (device.IsOnline) {
+				row.insertCell(2).innerHTML = `<span style="color: var(--clr-green)">Online</span>`;
+			} else {
+				row.insertCell(2).innerHTML = `<span style="color: var(--clr-red)">Offline</span>`;
+			}
 			row.insertCell(3).innerHTML = `<button onclick="this.getRootNode().host.removeDevice('${device.IP}')" style='font-weight:bold; color: var(--clr-red);'>-</button>`;
 		}
 	}
