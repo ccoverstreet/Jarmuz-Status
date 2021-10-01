@@ -238,6 +238,10 @@ func (app *StatusApp) RemoveDevice(ipAddress string) error {
 	app.Lock()
 	defer app.Unlock()
 
+	if _, ok := app.Devices[ipAddress]; !ok {
+		return fmt.Errorf("Device %s does not exist", ipAddress)
+	}
+
 	delete(app.Devices, ipAddress)
 
 	return app.Save()

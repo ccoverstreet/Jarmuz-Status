@@ -37,7 +37,7 @@ svg > * {
 	<div class="jmod-header" style="display: flex">
 		<h1>Status</h1>
 		<svg viewBox="0 0 360 360">
-			<circle cx="180", cy="180" r="120"/>
+			<path d="M 60 180 h 48 l 48 -90 l 48 180 l 48 -90 h 48"/>
         </svg>
 	</div>
 
@@ -63,11 +63,15 @@ svg > * {
 		</table>
 
 		<form id="status-add" onsubmit="event.preventDefault(); this.getRootNode().host.addDevice(event, this)">
-			<label>IP:</label>
-			<input id="status-add-ip"></input>
+			<div style="display: grid; grid-template-columns: 4em auto;">
+				<label style="text-align: right; margin-right: 0.5em;">IP:</label>
+				<input id="status-add-ip" style="margin-left: 0px;"></input>
+			</div>
 			<br>
-			<label>Name:</label>
-			<input id="status-add-name"></input>
+			<div style="display: grid; grid-template-columns: 4em auto;">
+				<label style="text-align: right; margin-right: 0.5em;">Name:</label>
+				<input id="status-add-name" style="margin-left: 0px;"></input>
+			</div>
 			<button onclick=""></button>
 		</form>
 	</div>
@@ -114,6 +118,10 @@ svg > * {
 	}
 
 	removeDevice(ip) {
+		if (!confirm(`Do you want to delete ${ip}`)) {
+			return
+		}
+
 		fetch(`/jmod/removeDevice?JMOD-Source=${this.source}`, {
 			method: "POST",
 			header: {
