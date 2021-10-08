@@ -44,6 +44,9 @@ svg > * {
 	<hr>
 
 	<div class="jmod-body">
+		<div id="control-box" style="display: flex; justify-content: flex-end;">
+			<button id="button-show-form" onclick="this.getRootNode().host.showAddDeviceForm()" style="font-weight: bold; background-color: var(--clr-green)">+</button>
+		</div>
 		<table id="status-table">
 			<thead>
 			<tr>
@@ -62,17 +65,19 @@ svg > * {
 			</tbody>
 		</table>
 
-		<form id="status-add" onsubmit="event.preventDefault(); this.getRootNode().host.addDevice(event, this)">
-			<div style="display: grid; grid-template-columns: 4em auto;">
-				<label style="text-align: right; margin-right: 0.5em;">IP:</label>
+		<form id="add-device-form"  style="display: none;" id="status-add" onsubmit="event.preventDefault(); this.getRootNode().host.addDevice(event, this)">
+			<div style="display: grid; grid-template-columns: 20% 80%;">
+				<label style="text-align: right; line-height: 1.4em; margin-right: 0.5em;">IP:</label>
 				<input id="status-add-ip" style="margin-left: 0px;"></input>
 			</div>
 			<br>
-			<div style="display: grid; grid-template-columns: 4em auto;">
-				<label style="text-align: right; margin-right: 0.5em;">Name:</label>
+			<div style="display: grid; grid-template-columns: 20% 80%;">
+				<label style="text-align: right;line-height: 1.4em; margin-right: 0.5em;">Name:</label>
 				<input id="status-add-name" style="margin-left: 0px;"></input>
 			</div>
-			<button onclick=""></button>
+			<div style="display: flex; justify-content: flex-end; margin-top: 1em;">
+				<button onclick="" style="background-color: var(--clr-green)">Add Device</button>
+			</div>
 		</form>
 	</div>
 </div>
@@ -140,7 +145,6 @@ svg > * {
 	}
 
 	addDevice(form) {
-		console.log(this);
 		let ip = this.shadowRoot.getElementById("status-add-ip").value;
 		let name = this.shadowRoot.getElementById("status-add-name").value;
 		fetch(`/jmod/addDevice?JMOD-Source=${this.source}`, {
@@ -151,10 +155,33 @@ svg > * {
 			body: JSON.stringify({ipAddress: ip, name: name})
 		})
 			.then(async res => {
+				this.showAddDeviceForm();
 				console.log(await res.text());
 			})
 			.catch(err => {
 				console.error(err);
+				alert(err);
 			})
+	}
+
+	showAddDeviceForm() {
+		let statusTable = this.shadowRoot.getElementById("status-table");
+		let formDisp = this.shadowRoot.getElementById("add-device-form");
+		let formDispButton = this.shadowRoot.getElementById("button-show-form");
+
+		console.log(statusTable.offsetHeight, statusTable.offsetWidth);
+
+		if (formDisp.style.display == "none") {
+			formDispButton.innerHTML = "x";
+			formDispButton.style.backgroundColor = "var(--clr-red)";
+			formDisp.style.display = "block";
+			formDisp.style.height = `${statusTable.offsetHeight}px`;
+			statusTable.style.display = "none";
+		} else {
+			formDispButton.innerHTML = "+";
+			formDispButton.style.backgroundColor = "var(--clr-green)";
+			formDisp.style.display = "none";
+			statusTable.style.display = "table";
+		}
 	}
 }
