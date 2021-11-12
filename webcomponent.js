@@ -171,11 +171,11 @@ svg > * {
 
 		console.log(statusTable.offsetHeight, statusTable.offsetWidth);
 
+
 		if (formDisp.style.display == "none") {
 			formDispButton.innerHTML = "x";
 			formDispButton.style.backgroundColor = "var(--clr-red)";
 			formDisp.style.display = "block";
-			formDisp.style.height = `${statusTable.offsetHeight}px`;
 			statusTable.style.display = "none";
 		} else {
 			formDispButton.innerHTML = "+";
