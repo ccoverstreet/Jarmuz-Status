@@ -26,9 +26,7 @@ svg > * {
 #status-table {
 	width: 100%;
 }
-#status-table-body {
 
-}
 #status-table-body > * > * {
 	text-align: center;
 }
@@ -45,7 +43,7 @@ svg > * {
 
 	<div class="jmod-body">
 		<div id="control-box" style="display: flex; justify-content: flex-end;">
-			<button id="button-show-form" onclick="this.getRootNode().host.showAddDeviceForm()" style="font-weight: bold; background-color: var(--clr-green)">+</button>
+			<button id="button-show-form" onclick="this.getRootNode().host.addDevice()" style="font-weight: bold; background-color: var(--clr-green)">+</button>
 		</div>
 		<table id="status-table">
 			<thead>
@@ -65,20 +63,6 @@ svg > * {
 			</tbody>
 		</table>
 
-		<form id="add-device-form"  style="display: none;" id="status-add" onsubmit="event.preventDefault(); this.getRootNode().host.addDevice(event, this)">
-			<div style="display: grid; grid-template-columns: 20% 80%;">
-				<label style="text-align: right; line-height: 1.4em; margin-right: 0.5em;">IP:</label>
-				<input id="status-add-ip" style="margin-left: 0px;"></input>
-			</div>
-			<br>
-			<div style="display: grid; grid-template-columns: 20% 80%;">
-				<label style="text-align: right;line-height: 1.4em; margin-right: 0.5em;">Name:</label>
-				<input id="status-add-name" style="margin-left: 0px;"></input>
-			</div>
-			<div style="display: flex; justify-content: flex-end; margin-top: 1em;">
-				<button onclick="" style="background-color: var(--clr-green)">Add Device</button>
-			</div>
-		</form>
 	</div>
 </div>
 		`
@@ -122,8 +106,8 @@ svg > * {
 		}
 	}
 
-	removeDevice(ip) {
-		if (!confirm(`Do you want to delete ${ip}`)) {
+	async removeDevice(ip) {
+		if (!(await jablko.confirm(`Do you want to delete ${ip}`))) {
 			return
 		}
 
@@ -144,44 +128,33 @@ svg > * {
 			})
 	}
 
-	addDevice(form) {
-		let ip = this.shadowRoot.getElementById("status-add-ip").value;
-		let name = this.shadowRoot.getElementById("status-add-name").value;
-		fetch(`/jmod/addDevice?JMOD-Source=${this.source}`, {
-			method: "POST",
-			header: {
-				"Content-Type": "application/json"
+	addDevice() {
+		jablko.prompt([
+			{
+				label: "IP Address",
+				type: "input",
+				id: "ipAddress"
 			},
-			body: JSON.stringify({ipAddress: ip, name: name})
-		})
-			.then(async res => {
-				this.showAddDeviceForm();
-				console.log(await res.text());
+			{
+				label: "Name",
+				type: "input",
+				id: "name"
+			}
+		], (output, elem) => {
+			fetch(`/jmod/addDevice?JMOD-Source=${this.source}`, {
+				method: "POST",
+				header: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(output)
 			})
-			.catch(err => {
-				console.error(err);
-				alert(err);
-			})
-	}
-
-	showAddDeviceForm() {
-		let statusTable = this.shadowRoot.getElementById("status-table");
-		let formDisp = this.shadowRoot.getElementById("add-device-form");
-		let formDispButton = this.shadowRoot.getElementById("button-show-form");
-
-		console.log(statusTable.offsetHeight, statusTable.offsetWidth);
-
-
-		if (formDisp.style.display == "none") {
-			formDispButton.innerHTML = "x";
-			formDispButton.style.backgroundColor = "var(--clr-red)";
-			formDisp.style.display = "block";
-			statusTable.style.display = "none";
-		} else {
-			formDispButton.innerHTML = "+";
-			formDispButton.style.backgroundColor = "var(--clr-green)";
-			formDisp.style.display = "none";
-			statusTable.style.display = "table";
-		}
+				.then(async res => {
+					elem.remove();
+					console.log(await res.text());
+				})
+				.catch(err => {
+					jablko.alert(err.toString());
+				});
+		});
 	}
 }
