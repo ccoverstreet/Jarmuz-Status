@@ -106,8 +106,6 @@ func (app *StatusApp) Run() {
 
 func (app *StatusApp) Poll() {
 	for {
-		log.Println(app.connList)
-
 		app.UpdateSummary()
 		app.PushConnections()
 
@@ -146,7 +144,6 @@ func (app *StatusApp) UpdateSummary() {
 	}
 
 	app.statusSummary = summary
-	log.Println(string(app.statusSummary))
 }
 
 func Ping(ipAddress string) bool {
